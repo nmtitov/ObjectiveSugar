@@ -168,6 +168,27 @@ describe(@"NSArray categories", ^{
         
     });
     
+    context(@"zipping", ^{
+        it(@"zips elements from two arrays of same size into one array", ^{
+            [[[oneToTen zip:[oneToTen reverse] with:^id(id left, id right) {
+                return @[left, right];
+            }] should] equal:@[ @[@1, @10], @[@2, @9], @[@3, @8], @[@4, @7], @[@5, @6], @[@6, @5], @[@7, @4], @[@8, @3], @[@9, @2], @[@10, @1] ]];
+            
+        });
+        
+        it(@"zips elements from two arrays of different size into one array with size of shortest array", ^{
+            [[[oneToTen zip:@[@"A", @"B", @"C"] with:^id(id left, id right) {
+                return @[left, right];
+            }] should] equal:@[ @[@1, @"A"], @[@2, @"B"], @[@3, @"C"] ]];
+            
+        });
+        
+        it(@"zips elements from two arrays of different size into one array with size of shortest array when shortest if on the left", ^{
+            [[[@[@"A", @"B", @"C"] zip:oneToTen with:^id(id left, id right) {
+                return @[left, right];
+            }] should] equal:@[ @[@"A", @1], @[@"B", @2], @[@"C", @3] ]];
+        });
+    });
 });
 
 

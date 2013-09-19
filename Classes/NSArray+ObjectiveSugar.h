@@ -191,4 +191,16 @@
 
 - (NSArray *)symmetricDifference:(NSArray *)array;
 
+/**
+ Return new array produced by zipping with other array using provided block. New array has size of shortest provided array.
+ 
+ @param Other array that should be zipped with current array
+ @param A block that returns new value produced by zipping value from left array and value from right array
+ 
+ @return An array of elements which are produced by zipping two array using provided block.
+ */
+
+- (NSArray *)zip:(NSArray *)other with:(id (^)(id left, id right))block;
+
+
 @end
