@@ -192,4 +192,11 @@
     return [zipped copy];
 }
 
+- (NSArray *)zip:(NSArray *)other;
+{
+    return [self zip:other with:^id(id left, id right) {
+        return @[left, right];
+    }];
+}
+
 @end
