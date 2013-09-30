@@ -178,4 +178,22 @@
     return [aSubtractB unionWithArray:bSubtractA];
 }
 
+- (NSArray *)zip:(NSArray *)other with:(id (^)(id left, id right))block {
+    NSUInteger min = MIN(self.count, other.count);
+    NSMutableArray *zipped = [NSMutableArray arrayWithCapacity:min];
+    
+    for (int i = 0; i < min; i++) {
+        id value = block(self[i], other[i]);
+        [zipped push:value];
+    }
+    
+    return [zipped copy];
+}
+
+- (NSArray *)zip:(NSArray *)other {
+    return [self zip:other with:^id(id left, id right) {
+        return @[left, right];
+    }];
+}
+
 @end
