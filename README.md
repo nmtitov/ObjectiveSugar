@@ -85,6 +85,10 @@ cars.first;
 // Testarossa
 cars.last
 // 458 Italia
+cars.sample
+// 458 Italia
+cars.sample
+// F50
 
 [cars map:^id(id car){
 	return @([[car substringToIndex:1] isEqualToString:@"F"]);
@@ -113,13 +117,22 @@ NSArray *numbers = @[ @5, @2, @7, @1 ];
 #### NSArray only
 ``` objc
 
-NSArray *indices = @[@1, @2, @3, @4, @5];
-indices[@"1..3"];
-// [@2, @3, @4]
+NSArray *indices = @[@1, @2, @3, @4, @5, @6];
+indices[@"2..4"];
+// index from 2 to 4
+// [@3, @4, @5]
 
-NSValue *range = [NSValue valueWithRange:NSMakeRange(1, 3)];
+indices[@"2…4"];
+// index from 2 to 4 (excluded)
+// [@3, @4]
+
+indices[@"2,4"];
+// range location: 2, length: 4
+// [@3, @4, @5, @6]
+
+NSValue *range = [NSValue valueWithRange:NSMakeRange(2, 4)];
 indices[range];
-// [@2, @3, @4]
+// [@3, @4, @5, @6]
 
 NSArray *fruits = @[ @"banana", @"mango", @"apple", @"pear" ];
 
@@ -130,12 +143,12 @@ NSLog(@"Is apple a fruit? %@", [fruits includes:@"apple"] ? @"Yes" : @"No"];
 // banana, mango, apple
 
 [someFruits takeWhile:^BOOL(id fruit) {
-	return ![fruit isEqualToString:@"apple"];
+  return ![fruit isEqualToString:@"apple"];
 }];
 // banana, mango
 
 
-NSArray *landLockedCountries = @[ @"Bolivia", @"Paraguay", @"Austria", @"Switzerland", @"Hungary" ];
+NSArray *landlockedCountries = @[ @"Bolivia", @"Paraguay", @"Austria", @"Switzerland", @"Hungary" ];
 NSArray *europeanCountries = @[ @"France", @"Germany", @"Austria", @"Spain", @"Hungary", @"Poland", @"Switzerland" ];
 
 
@@ -152,7 +165,7 @@ NSArray *europeanCountries = @[ @"France", @"Germany", @"Austria", @"Spain", @"H
 // notLandlockedEuropeanCountries = France, Germany, Spain, Poland
 
 [landlockedCountries symmetricDifference:europeanCountries];
-// uniqueCountries = Bolivia, Paraguay, Austria, Switzerland, Hungary, France, Germany, Spain, Poland
+// uniqueCountries = Bolivia, Paraguay, France, Germany, Spain, Poland
 
 
 NSArray *nestedArray = @[ @[ @1, @2, @3 ], @[ @4, @5, @6, @[ @7, @8 ] ], @9, @10 ];
@@ -261,9 +274,9 @@ NSString *sentence = NSStringWithFormat(@"This is a text-with-argument %@", @123
 #### C additions
 
 ``` objc
-unless([girl isTaken]) {
+unless(_messages) { 
   // the code runs only if condition is false
-  [girl giveMeYourNumber];
+  _messages = [self initializeMessages];
 }
 ```
 ### Contributing

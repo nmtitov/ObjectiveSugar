@@ -8,6 +8,7 @@
 
 #import "NSArray+ObjectiveSugar.h"
 #import "NSMutableArray+ObjectiveSugar.h"
+#import "NSString+ObjectiveSugar.h"
 
 @implementation NSArray (ObjectiveSugar)
 
@@ -22,10 +23,23 @@
     return [self lastObject];
 }
 
+- (id) sample {
+    if (self.count == 0) return nil;
+
+    NSUInteger index = arc4random_uniform(self.count);
+    return self[index];
+}
+
 - (id)objectForKeyedSubscript:(id <NSCopying>)key {
     NSRange range;
     if ([(id)key isKindOfClass:[NSString class]]) {
-        range = NSRangeFromString((NSString *)key);
+        NSString *keyString = (NSString *)key;
+        range = NSRangeFromString(keyString);
+        if ([keyString containsString:@"..."]) {
+            range = NSMakeRange(range.location, range.length - range.location);
+        } else if ([keyString containsString:@".."]) {
+            range = NSMakeRange(range.location, range.length - range.location + 1);
+        }
     } else if ([(id)key isKindOfClass:[NSValue class]]) {
         range = [((NSValue *)key) rangeValue];
     } else {
@@ -85,7 +99,9 @@
     
     for (id object in self) {
         id newObject = block(object);
-        [array addObject:newObject];
+        if (newObject) {
+          [array addObject:newObject];
+        }
     }
     
     return array;
@@ -111,6 +127,10 @@
     }
 
     return nil;
+}
+
+- (id)find:(BOOL (^)(id object))block {
+    return [self detect:block];
 }
 
 - (NSArray *)reject:(BOOL (^)(id object))block {
@@ -149,6 +169,11 @@
 
 - (NSArray *)sort {
     return [self sortedArrayUsingSelector:@selector(compare:)];
+}
+
+- (NSArray *)sortBy:(NSString*)key; {
+    NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:key ascending:YES];
+    return [self sortedArrayUsingDescriptors:@[descriptor]];
 }
 
 - (NSArray *)reverse {

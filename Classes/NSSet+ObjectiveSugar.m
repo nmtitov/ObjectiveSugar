@@ -7,6 +7,7 @@
 //
 
 #import "NSSet+ObjectiveSugar.h"
+#import "NSArray+ObjectiveSugar.h"
 
 @implementation NSSet (ObjectiveSugar)
 
@@ -20,6 +21,10 @@
 
 - (id)last {
     return self.allObjects.lastObject;
+}
+
+- (id)sample {
+    return [self.allObjects sample];
 }
 
 - (void)each:(void (^)(id))block {
