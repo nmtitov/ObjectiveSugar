@@ -1,20 +1,18 @@
-PROJECT_NAME=ObjectiveSugar
-WORKSPACE=$(PROJECT_NAME).xcworkspace
-DEFAULT_SCHEME=$(PROJECT_NAME)
+project_name  = ObjectiveSugar
+workspace     = $(project_name).xcworkspace
+xcodebuild    = xcodebuild -workspace $(workspace) -scheme $(project_name) -sdk iphonesimulator
+
+clean:
+	$(xcodebuild) clean
 
 test:
-	xctool -workspace $(WORKSPACE) -scheme $(DEFAULT_SCHEME) \
-		-sdk iphonesimulator ONLY_ACTIVE_ARCH=NO clean test
+	$(xcodebuild) test | tee xcodebuild.log
 
-remove_pods:
-	rm -rf Pods
-	rm Podfile.lock
-
-install_pods:
+install:
+	gem install cocoapods --no-ri --no-rdoc
+	gem install xcpretty  --no-ri --no-rdoc
 	pod install
 
-install_tools:
-	gem update cocoapods
-
-ci: install_tools remove_pods install_pods test
+ci:
+	$(xcodebuild) test | xcpretty -c
 

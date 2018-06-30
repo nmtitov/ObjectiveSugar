@@ -8,6 +8,8 @@
 
 // For an overview see http://cocoadocs.org/docsets/ObjectiveSugar/
 
+#import <Foundation/Foundation.h>
+
 @interface NSArray (ObjectiveSugar)
 
 /**
@@ -15,33 +17,38 @@
 
  @return  The first item in the array, or nil.
  */
-
-- (id) first;
+- (id)first DEPRECATED_MSG_ATTRIBUTE("Please use -firstObject instead");
 
 /**
  The last item in the array, or nil.
 
  @return  The last item in the array, or nil.
  */
-
-- (id) last;
-
+- (id)last DEPRECATED_MSG_ATTRIBUTE("Please use -lastObject instead");
 
 /**
  A random element in the array, or nil.
 
  @return  A random element in the array, or nil.
  */
+- (id)sample;
 
-- (id) sample;
+/// Alias for -sample
+- (id)anyObject;
 
 
 /**
  Allow subscripting to fetch elements within the specified range
- 
- @param An NSValue wrapping an NSRange struct or an NSString with valid range components. If it is an NSString, it will be parsed to an NSRange. eg. @"1..3" specifying the range from 1 to 3. @"1...3" specifying the range from 1 to 2 (exclude the end value 3). Other strinig which contains two int values (@"1,3") will be parsed as range's location and length.
- 
- @return An array with all the elements within the specified range
+
+ @param key An NSString or NSValue wrapping an NSRange. It's intended to behave like Ruby's array range accessors.
+
+        Given array of 10 elements, e.g. [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], you can perform these operations:
+        array[@"1..3"] will give you [2, 3, 4]
+        array[@"1...3"] will give you [2, 3] (last value excluded)
+        array[@"1,3"] implies NSRange(location: 1, length: 3), and gives you [2, 3, 4]
+
+
+ @return An array with elements within the specified range
  */
 - (id)objectForKeyedSubscript:(id <NSCopying>)key;
 
@@ -49,42 +56,57 @@
 /**
  A simpler alias for `enumerateObjectsUsingBlock`
 
- @param A block with the object in its arguments.
+ @param block A block with the object in its arguments.
  */
-
 - (void)each:(void (^)(id object))block;
 
 /**
  A simpler alias for `enumerateObjectsUsingBlock` which also passes in an index
 
- @param A block with the object in its arguments.
+ @param block A block with the object in its arguments.
+ */
+- (void)eachWithIndex:(void (^)(id object, NSUInteger index))block;
+
+/**
+ A simpler alias for `enumerateObjectsWithOptions:usingBlock:`
+
+ @param block A block with the object in its arguments.
+ @param options Enumerating options.
  */
 
-- (void)eachWithIndex:(void (^)(id object, int index))block;
+- (void)each:(void (^)(id object))block options:(NSEnumerationOptions)options;
+
+/**
+ A simpler alias for `enumerateObjectsWithOptions:usingBlock:` which also passes in an index
+
+ @param block A block with the object in its arguments.
+ @param options Enumerating options.
+ */
+
+- (void)eachWithIndex:(void (^)(id object, NSUInteger index))block options:(NSEnumerationOptions)options;
+
 
 /**
  An alias for `containsObject`
 
- @param An object that the array may or may not contain.
+ @param object An object that the array may or may not contain.
  */
-
 - (BOOL)includes:(id)object;
 
 /**
  Take the first `numberOfElements` out of the array, or the maximum amount of
  elements if it is less.
 
- @param Number of elements to take from array
+ @param numberOfElements Number of elements to take from array
  @return An array of elements
  */
-
 - (NSArray *)take:(NSUInteger)numberOfElements;
 
 /**
- Passes elements to the `block` until the block returns NO, 
+ Passes elements to the `block` until the block returns NO,
  then stops iterating and returns an array of all prior elements.
 
- @param A block that returns YES/NO
+ @param block A block that returns YES/NO
  @return An array of elements
  */
 - (NSArray *)takeWhile:(BOOL (^)(id object))block;
@@ -93,28 +115,25 @@
  Iterate through the current array running the block on each object and
  returning an array of the changed objects.
 
- @param A block that passes in each object and returns a modified object
+ @param block A block that passes in each object and returns a modified object
  @return An array of modified elements
  */
-
 - (NSArray *)map:(id (^)(id object))block;
 
 /**
  Iterate through current array asking whether to keep each element.
 
- @param A block that returns YES/NO for whether the object should stay
+ @param block A block that returns YES/NO for whether the object should stay
  @return An array of elements selected
  */
-
 - (NSArray *)select:(BOOL (^)(id object))block;
 
 /**
  Iterate through current array returning the first element meeting a criteria.
 
- @param A block that returns YES/NO
+ @param block A block that returns YES/NO
  @return The first matching element
  */
-
 - (id)detect:(BOOL (^)(id object))block;
 
 
@@ -122,19 +141,17 @@
  Alias for `detect`. Iterate through current array returning the first element
  meeting a criteria.
 
- @param A block that returns YES/NO
+ @param block A block that returns YES/NO
  @return The first matching element
  */
-
 - (id)find:(BOOL (^)(id object))block;
 
 /**
  Iterate through current array asking whether to remove each element.
 
- @param A block that returns YES/NO for whether the object should be removed
+ @param block A block that returns YES/NO for whether the object should be removed
  @return An array of elements not rejected
  */
-
 - (NSArray *)reject:(BOOL (^)(id object))block;
 
 /**
@@ -142,15 +159,20 @@
 
  @return An array of all held arrays merged
  */
-
 - (NSArray *)flatten;
+
+/**
+ Remove all the nulls from array
+
+ @return A copy of the given array without NSNulls
+ */
+- (NSArray *)compact;
 
 /**
  Alias for `componentsJoinedByString` with a default of no seperator
 
- @return A string of all objects joined with an empty string 
+ @return A string of all objects joined with an empty string
  */
-
 - (NSString *)join;
 
 /**
@@ -158,12 +180,11 @@
 
  @return A string of all objects joined with the `seperator` string
  */
-
 - (NSString *)join:(NSString *)separator;
 
 /**
  Run the default comparator on each object in the array
- 
+
  @return A sorted copy of the array
  */
 - (NSArray *)sort;
@@ -173,11 +194,11 @@
 
  @return A sorted copy of the array
  */
-- (NSArray *)sortBy:(NSString*)key;
+- (NSArray *)sortBy:(NSString *)key;
 
 /**
  Alias for reverseObjectEnumerator.allObjects
- 
+
  Returns a reversed array
  */
 - (NSArray *)reverse;
@@ -188,7 +209,6 @@
 
  @return An array of objects common to both arrays
  */
-
 - (NSArray *)intersectionWithArray:(NSArray *)array;
 
 /**
@@ -215,28 +235,26 @@
 
  @return An array of elements which are in either of the arrays and not in their intersection.
  */
-
 - (NSArray *)symmetricDifference:(NSArray *)array;
 
 /**
- Return new array produced by zipping with other array using provided block. New array has size of shortest provided array.
- 
- @param Other array that should be zipped with current array
- @param A block that returns new value produced by zipping value from left array and value from right array
- 
- @return An array of elements which are produced by zipping two array using provided block.
- */
+ Return a single value from an array by iterating through the elements and transforming a running total.
 
-- (NSArray *)zip:(NSArray *)other with:(id (^)(id left, id right))block;
+ @return A single value that is the end result of apply the block function to each element successively.
+ **/
+- (id)reduce:(id (^)(id accumulator, id object))block;
 
 /**
- Return new array produced by zipping with other array. New array has size of shortest provided array. Zip accomplished using base zip function, which returns array of size 2 containing left and right element.
- 
- @param Other array that should be zipped with current array
- 
- @return An array of elements which are produced by zipping two array.
- */
+ Same as -reduce, with initial value provided by yourself
+ **/
+- (id)reduce:(id)initial withBlock:(id (^)(id accumulator, id object))block;
 
-- (NSArray *)zip:(NSArray *)other;
+/**
+ Produces a duplicate-free version of the array
+ 
+ @return a new array with all unique elements
+ **/
+- (NSArray *)unique;
 
 @end
+
